@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Welcome {{request.user}} to Student Dashboard</h1>
+    
+    <h2>All Courses</h2>
+    <ul>
+        {% for course in all_courses %}
+            <li>
+                <div style="display: flex; align-items: center;">
+                    <!-- Course title and instructor details -->
+                    <p style="margin-right: 10px;">{{ course.title }} - {{ course.instructor }}</p>
+                    
+                    {% if course in enrolled_courses %}
+                        <span style="margin-left: 10px;">- Enrolled</span>
+                    {% else %}
+                        <!-- Enroll button in line with the text -->
+                        <form method="post" action="{% url 'course_enroll' course.id %}" style="display: inline; margin-left: 10px;">
+                            {% csrf_token %}
+                            <button type="submit">Enroll</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    
+
+    <h2>Enrolled Courses</h2>
+    <ul>
+        {% for course in enrolled_courses %}
+            <li><a href="{% url 'course_detail' course.id %}">{{ course.title }}</a></li>
+        {% empty %}
+            <li>No courses enrolled.</li>
+        {% endfor %}
+    </ul>
+    {% if last_accessed_course %}
+    <p>Your last accessed course: <a href="{% url 'course_detail' last_accessed_course.id %}">{{ last_accessed_course.title }}</a></p>
+{% else %}
+    <p>You haven't accessed any course yet.</p>
+{% endif %}
+
+<form action="{% url 'logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+</form>
+
+</body>
+</html>
